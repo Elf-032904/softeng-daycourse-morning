@@ -12,17 +12,21 @@ def smoothie(ingredients: list[str], base: str = "water", ice: bool = True) -> s
     Returns:
         str: A description of the smoothie.
     """
-    base_str = base.strip().lower()
+    # base normalization (default: water)
+    base_str = (base or "").strip()
     if base_str == "":
         base_str = "water"
 
-    if not ingredients:
-        return f"{'Icy' if ice else 'Just'} {base_str.title()}!"
-
-    if not all(isinstance(i, str) for i in ingredients):
+    # ingredients must be non-empty list of strings
+    if not ingredients or not all(isinstance(i, str) for i in ingredients):
         return "I don't know how to make that smoothie!"
 
-    unique_ingredients = sorted(set(ingredient.strip().lower() for ingredient in ingredients))
+    # normalize ingredients (keep duplicates, only trim + lower)
+    cleaned = [i.strip().lower() for i in ingredients]
+    if any(i == "" for i in cleaned):
+        return "I don't know how to make that smoothie!"
 
-    smoothie = f"{'Icy ' if ice else ''}{base_str.title()} smoothie with " + ", ".join(unique_ingredients)
-    return smoothie
+    cleaned.sort()  # alphabetical
+
+    ice_prefix = "Icy " if ice else ""
+    return f"{ice_prefix}{base_str.title()} smoothie with " + ", ".join(cleaned)
